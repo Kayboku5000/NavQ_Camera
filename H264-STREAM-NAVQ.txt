@@ -1,0 +1,97 @@
+sudo gst-launch-1.0 v4l2src ! video/x-raw,width=640,height=480,framerate=30/1 ! vpuenc_h264 bitrate=500 ! rtph264pay ! udpsink host=192.168.1.10 port=5000 sync=false
+
+
+
+
+This is the code to stream from the navq
+
+sudo gst-launch-1.0 v4l2src ! video/x-raw,width=640,height=480,framerate=30/1 ! vpuenc_h264 bitrate=500 ! rtph264pay ! udpsink host=192.168.1.10 port=5000 sync=false
+
+sudo gst-launch-1.0 v4l2src ! video/x-raw,width=640,height=480,framerate=30/1 ! vpuenc_h264 bitrate=500 ! rtph264pay ! udpsink host=192.168.1.10 port=5000 sync=false
+
+
+Instrucions from Paul Mc
+A source is something like the camera
+a sink is where it is output too.
+if they are not compatable, you need to do conversions
+
+
+install     sudo apt-get install v4l-utils
+
+commands in gstreamer
+sudo gst-launch-1.0      this launches gtreamer
+!     this is to pipe from one thing to another
+!     connects one module to anothermodule
+audiotestsrc     this is an internal audio tone generator
+alsasink         this is an audio output
+gst-inspect-1.0  
+
+
+
+
+different parameters can be set, by finding the number within the elements.
+gst-inspect-1.0 audiotestsrc
+
+gst-launch-1.0 videotestsrc ! ximagesink
+gst-inspect-1.0 videotestsrc
+gst-inspect-1.0 ximagesink
+
+
+
+gst-launch-1.0 audiotestsrc wave=1 ! alsasink
+
+parameters requie a space in between them
+commas are used for setting capabilities, or variations on an element, ie width, height
+
+use the inspect function to find compatable input output prototocols
+audio/x-raw, format=u8
+
+
+autovideoconvert is a great module for converting video
+videoconvert is a manual video conversion module
+
+gst-launch-1.0 videotestsrc pattern=0 ! video/x-raw, format=BGR ! autovideoconvert ! videoconvert ! video/x-raw, width=1280, height=960 ! ximagesink
+
+name of rasp pi camera
+nvarguscamerasrc
+nvarguscamerasrc sensor-id=0 ! video/x-raw
+
+also
+v4l2src device=/dev/video1 ! video/x-raw,width=
+
+
+gst-launch-1.0 nvarguscamerasrc ! nvvidconv flip-method=2 ! video/x-raw,width=1280,height=840 ! autovideoconvert ! ximagesink
+
+pixels 3264 pixels wide, 2464 high
+
+vpuenc_h246   h264 encoder
+
+h265parse     h265 parser
+
+video/h-265
+video/x-raw    
+video/x-h265
+
+mpeg4videoparse      MPEG 4 elementary stream parser
+
+udpsink    udp packet sender
+multiudpsink
+
+hlssink     http live streaming sink
+hlssink2    http live streaming sink 2
+
+rtph265depay      265 depayloader
+rtph265pay        265 payloader
+
+
+streaming from raspberry p
+https://toptechboy.com/ai-on-the-jetson-nano-lesson-62-create-a-streaming-ip-camera-from-a-raspberry-pi-zero-w/
+
+raspivid -t 0 -w 1280 -h 720 -fps 30 -b 2000000 -awb auto -n -o - | gst-launch-1.0 -v fdsrc ! h264parse ! rtph264pay config-interval=1 pt=96 ! gdppay ! tcpserversink host=0.0.0.0 port=8554
+
+
+
+camSet2=' tcpclientsrc host=10.1.37.28 port=8554 ! gdpdepay ! rtph264depay ! h264parse ! nvv4l2decoder  ! nvvidconv flip-method='+str(flip)+' ! video/x-raw,format=BGRx ! videoconvert ! video/x-raw, width='+str(dispW)+', height='+str(dispH)+',format=BGR ! appsink  drop=true sync=false '
+
+
+sudo apt install libgstreamer1.0-0 gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-doc gstreamer1.0-tools gstreamer1.0-x gstreamer1.0-alsa gstreamer1.0-gl gstreamer1.0-gtk3 gstreamer1.0-qt5 gstreamer1.0-pulseaudio
