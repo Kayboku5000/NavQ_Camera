@@ -1,0 +1,17 @@
+raspivid -o - -t 0 -vf -hf -fps 10 -b 500000 | ffmpeg -re -ar 44100 -ac 2 -acodec pcm_s16le -f s16le -ac 2 -i /dev/zero -f h264 -i - -vcodec copy -acodec aac -ab 128k -g 50 -strict experimental -f flv rtmp://rtmp-api.facebook.com:80/rtmp/STREAM-KEY
+
+
+The Break down
+
+The following is the command broken down into sections, each part of the terminal command is configuring the live feed into a video format to send to YouTube or Facebook.
+
+-o - Makes it write the video data from the Pi camera to STDOUT so it gets piped into ffmpeg
+-t 0 - Record the video until you manually stop the program
+-vf -hf - Flips the image horizontal and vertical so it looks correct
+-fps 30 - Sets frames per second to 30
+-b 6000000 - output bitrate limit. YouTube recommends 400-600kbps, this is 600kbps.
+-re - tells ffmpeg to slow down the reading of the input to the native frame rate of the input
+-ar 44100 -ac 2 -acodec pcm_s16le -f s16le -ac 2 -i /dev/zero and -acodec aac -ab 128k and -strict experimental - Adds a dummy audio channel filled with zero data (YouTube rejects streams without an audio channel)
+-g 50 - Adds a keyframe every 50 frames.
+-f h264 and -f flv tells ffmpeg it's receiving h264 input and that you should mux it into flv output
+By not using -w and -h in raspivid you will get the full 1920x1080 HD resolution streamed
